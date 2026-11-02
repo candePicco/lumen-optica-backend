@@ -69,8 +69,9 @@ class ProductoViewSet(viewsets.ModelViewSet):
     ]
 
     search_fields = [
-        "nombre",
-        "descripcion",
+    "nombre",
+    "descripcion",
+    "marca__nombre",
     ]
 
     ordering_fields = [
