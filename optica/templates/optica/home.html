@@ -1,0 +1,35 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lumen Óptica</title>
+</head>
+
+<body style="font-family: Arial; text-align: center; padding: 40px;">
+
+    <img
+        src="{% static 'optica/logo.png' %}"
+        alt="Lumen Óptica"
+        width="280"
+    >
+
+    <h1>Lumen Óptica</h1>
+
+    <p>
+        API REST para la gestión de productos, clientes y pedidos.
+    </p>
+
+    <p>
+        <a href="/api/">Ver API</a>
+        |
+        <a href="/api/docs/">Swagger</a>
+        |
+        <a href="/api/redoc/">Redoc</a>
+        |
+        <a href="/admin/">Admin</a>
+    </p>
+
+</body>
+</html>

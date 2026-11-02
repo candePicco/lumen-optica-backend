@@ -1,0 +1,36 @@
+# Entorno virtual
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Base de datos local
+db.sqlite3
+
+# Variables de entorno
+.env
+
+# Archivos de sistema
+.DS_Store
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Archivos temporales
+*.log
+
+# Media subida por usuarios
+media/
+
+# Cache de pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
