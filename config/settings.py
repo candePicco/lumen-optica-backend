@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
+
+from config.env import build_databases, env_bool, env_list, env_str
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +24,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ozl44#oeb(lj$vb8%x9u1sv!)ue--zr(*)a&h@1et@teol^i+&'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool("DJANGO_DEBUG", True)
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+# Sin DJANGO_SECRET_KEY solo se permite la clave insegura en modo DEBUG
+# (es publica en GitHub); con DEBUG apagado se corta el arranque.
+SECRET_KEY = env_str("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY es obligatoria cuando DJANGO_DEBUG esta apagado."
+        )
+    SECRET_KEY = 'django-insecure-ozl44#oeb(lj$vb8%x9u1sv!)ue--zr(*)a&h@1et@teol^i+&'
+
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", [])
 
 
 # Application definition
@@ -48,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -80,12 +94,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# PostgreSQL cuando DB_HOST esta definido (Docker Compose); SQLite si no.
+DATABASES = build_databases(os.environ, BASE_DIR)
 
 
 # Password validation
@@ -118,6 +128,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    # Sin Manifest: el post-procesado falla con source maps faltantes
+    # en paquetes vendorizados (sidecar de Swagger).
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+
+MEDIA_URL = "media/"
+MEDIA_ROOT = env_str("DJANGO_MEDIA_ROOT", str(BASE_DIR / "media"))
 
 
 # Email
@@ -154,7 +179,18 @@ SPECTACULAR_SETTINGS = {
     "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
     "REDOC_DIST": "SIDECAR",
 }
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+CORS_ALLOWED_ORIGINS = env_list(
+    "DJANGO_CORS_ALLOWED_ORIGINS",
+    [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+)
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", [])
+
+# Endurecimiento solo fuera de DEBUG. TLS se termina antes (proxy),
+# por eso no hay SECURE_SSL_REDIRECT.
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = env_bool("DJANGO_SECURE_COOKIES", not DEBUG)
+CSRF_COOKIE_SECURE = env_bool("DJANGO_SECURE_COOKIES", not DEBUG)
