@@ -1,8 +1,10 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import render
+
 from .models import (
     Categoria,
     Cliente,
@@ -69,8 +71,9 @@ class ProductoViewSet(viewsets.ModelViewSet):
     ]
 
     search_fields = [
-        "nombre",
-        "descripcion",
+    "nombre",
+    "descripcion",
+    "marca__nombre",
     ]
 
     ordering_fields = [
@@ -103,13 +106,14 @@ class ImagenProductoViewSet(viewsets.ModelViewSet):
 class ClienteViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all().select_related("usuario")
     serializer_class = ClienteSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
 
 class DireccionViewSet(viewsets.ModelViewSet):
     queryset = Direccion.objects.all().select_related("cliente")
     serializer_class = DireccionSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
+
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all().select_related(
@@ -119,7 +123,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
         "detalles",
         "detalles__producto",
     )
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -134,13 +138,14 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(pedido)
         return Response(serializer.data)
+    
 
 class DetallePedidoViewSet(viewsets.ModelViewSet):
     queryset = DetallePedido.objects.all().select_related(
         "pedido",
         "producto",
     )
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -151,4 +156,4 @@ class DetallePedidoViewSet(viewsets.ModelViewSet):
 class PagoViewSet(viewsets.ModelViewSet):
     queryset = Pago.objects.all().select_related("pedido")
     serializer_class = PagoSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
