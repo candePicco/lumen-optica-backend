@@ -518,6 +518,6 @@ git push -u origin feature/mi-tarea
 | Integrante | Nombre | Usuario de GitHub | Rol |
 |---|---|---|---|
 | 1 | Candela Picco | `candePicco` | Creación del repositorio y estructura base del proyecto |
-| 2 | _Completar_ | _Completar_ | CORS y Docker |
-| 3 | Federico Ramirez | _Completar_ | README, diagrama de modelos y capturas |
-| 4 | _Completar_ | _Completar_ | Admin, Swagger/Redoc y pruebas de endpoints |
+| 2 | Mateo Johnston | `mateoJk` | CORS y Docker |
+| 3 | Federico Ramirez | `federamirezz` | README, diagrama de modelos y capturas |
+| 4 | Juan Laporte | `JLaporte1` | Admin, Swagger/Redoc y pruebas de endpoints |
