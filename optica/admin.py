@@ -14,16 +14,33 @@ from .models import (
 )
 
 
+class ImagenProductoInline(admin.TabularInline):
+    model = ImagenProducto
+    extra = 0
+
+
+class DetallePedidoInline(admin.TabularInline):
+    model = DetallePedido
+    extra = 0
+
+
+class PagoInline(admin.TabularInline):
+    model = Pago
+    extra = 0
+
+
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ["id", "nombre"]
     search_fields = ["nombre"]
+    ordering = ["nombre"]
 
 
 @admin.register(Marca)
 class MarcaAdmin(admin.ModelAdmin):
     list_display = ["id", "nombre"]
     search_fields = ["nombre"]
+    ordering = ["nombre"]
 
 
 @admin.register(Proveedor)
@@ -52,6 +69,8 @@ class ProductoAdmin(admin.ModelAdmin):
         "activo",
     ]
     ordering = ["nombre"]
+    list_select_related = ["categoria", "marca", "proveedor"]
+    inlines = [ImagenProductoInline]
 
 
 @admin.register(ImagenProducto)
@@ -62,6 +81,8 @@ class ImagenProductoAdmin(admin.ModelAdmin):
         "principal",
     ]
     list_filter = ["principal"]
+    list_select_related = ["producto"]
+    search_fields = ["producto__nombre"]
 
 
 @admin.register(Cliente)
@@ -80,6 +101,7 @@ class ClienteAdmin(admin.ModelAdmin):
         "dni",
     ]
     ordering = ["apellido", "nombre"]
+    list_select_related = ["usuario"]
 
 
 @admin.register(Direccion)
@@ -97,6 +119,7 @@ class DireccionAdmin(admin.ModelAdmin):
         "cliente__apellido",
         "ciudad",
     ]
+    list_select_related = ["cliente"]
 
 
 @admin.register(Pedido)
@@ -114,6 +137,8 @@ class PedidoAdmin(admin.ModelAdmin):
         "cliente__apellido",
     ]
     ordering = ["-fecha"]
+    list_select_related = ["cliente", "direccion"]
+    inlines = [DetallePedidoInline, PagoInline]
 
 
 @admin.register(DetallePedido)
@@ -125,6 +150,7 @@ class DetallePedidoAdmin(admin.ModelAdmin):
         "cantidad",
         "precio_unitario",
     ]
+    list_select_related = ["pedido", "producto"]
 
 
 @admin.register(Pago)
@@ -142,3 +168,4 @@ class PagoAdmin(admin.ModelAdmin):
         "estado",
     ]
     ordering = ["-fecha"]
+    list_select_related = ["pedido"]
