@@ -1,0 +1,93 @@
+erDiagram
+    CATEGORIA ||--o{ PRODUCTO : "clasifica"
+    MARCA ||--o{ PRODUCTO : "fabrica"
+    PROVEEDOR ||--o{ PRODUCTO : "provee"
+    PRODUCTO ||--o{ IMAGEN_PRODUCTO : "tiene"
+    USER ||--|| CLIENTE : "perfil 1:1"
+    CLIENTE ||--o{ DIRECCION : "registra"
+    CLIENTE ||--o{ PEDIDO : "realiza"
+    DIRECCION ||--o{ PEDIDO : "se envia a"
+    PEDIDO ||--o{ DETALLE_PEDIDO : "contiene"
+    PRODUCTO ||--o{ DETALLE_PEDIDO : "aparece en"
+    PEDIDO ||--o{ PAGO : "se paga con"
+
+    CATEGORIA {
+        int id PK
+        varchar nombre
+        text descripcion
+    }
+    MARCA {
+        int id PK
+        varchar nombre
+        text descripcion
+    }
+    PROVEEDOR {
+        int id PK
+        varchar nombre
+        varchar telefono
+        email email
+    }
+    PRODUCTO {
+        int id PK
+        varchar nombre
+        text descripcion
+        decimal precio
+        int stock
+        bool destacado
+        bool activo
+        int categoria_id FK
+        int marca_id FK
+        int proveedor_id FK
+    }
+    IMAGEN_PRODUCTO {
+        int id PK
+        int producto_id FK
+        image imagen
+        bool principal
+    }
+    USER {
+        int id PK
+        varchar username
+        varchar email
+        varchar password
+    }
+    CLIENTE {
+        int id PK
+        int usuario_id FK "unique"
+        varchar nombre
+        varchar apellido
+        varchar dni "unique"
+        varchar telefono
+    }
+    DIRECCION {
+        int id PK
+        int cliente_id FK
+        varchar calle
+        varchar numero
+        varchar ciudad
+        varchar provincia
+        varchar codigo_postal
+    }
+    PEDIDO {
+        int id PK
+        int cliente_id FK
+        int direccion_id FK
+        datetime fecha
+        varchar estado
+        decimal total
+    }
+    DETALLE_PEDIDO {
+        int id PK
+        int pedido_id FK
+        int producto_id FK
+        int cantidad
+        decimal precio_unitario
+    }
+    PAGO {
+        int id PK
+        int pedido_id FK
+        decimal monto
+        varchar metodo
+        varchar estado
+        datetime fecha
+    }
